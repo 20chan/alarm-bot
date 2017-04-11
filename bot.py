@@ -16,7 +16,7 @@ delta_regex = re.compile(
 date_regex = re.compile(
     '((?P<year>\d+?)년)?[ ]*((?P<month>\d+?)월)?[ ]*((?P<day>\d+?)일)?[ ]*'
     '((?P<hour>\d+?)(시간?))?[ ]*((?P<minute>\d+?)분)?[ ]*((?P<second>\d+?)초)?')
-msg_regex = re.compile('.*에(?P<msg>.*)')
+msg_regex = re.compile('[^에]*에(?P<msg>.*)')
 
 
 def parse(text: str) -> Tuple[datetime, str]:
