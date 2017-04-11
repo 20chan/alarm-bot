@@ -12,9 +12,9 @@ api = tweepy.API(auth, wait_on_rate_limit=True)
 
 queue = []
 delta_regex = re.compile(
-    '((?P<days>\d+?)일)?[ ]*((?P<hours>\d+?)(시간?))?[ ]*((?P<minutes>\d+?)분)?[ ]*((?P<seconds>\d+?)초)?')
+    '[^\d]*((?P<days>\d+?)일)?[ ]*((?P<hours>\d+?)(시간?))?[ ]*((?P<minutes>\d+?)분)?[ ]*((?P<seconds>\d+?)초)?')
 date_regex = re.compile(
-    '((?P<year>\d+?)년)?[ ]*((?P<month>\d+?)월)?[ ]*((?P<day>\d+?)일)?[ ]*'
+    '[^\d]*((?P<year>\d+?)년)?[ ]*((?P<month>\d+?)월)?[ ]*((?P<day>\d+?)일)?[ ]*'
     '((?P<hour>\d+?)(시간?))?[ ]*((?P<minute>\d+?)분)?[ ]*((?P<second>\d+?)초)?')
 msg_regex = re.compile('[^에]*에(?P<msg>.*)')
 
@@ -80,7 +80,7 @@ def check_and_say():
         if len(queue) > 0:
             if queue[0][0][0] < datetime.now():
                 api.update_status('@'+queue[0][1]+' '+queue[0][0][1])
-                print('Popped' + queue.pop(0)[0][1])
+                print('보냄 : ' + queue.pop(0)[0][1])
         sleep(0.5)
 
 
