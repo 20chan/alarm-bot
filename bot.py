@@ -1,6 +1,14 @@
 from typing import Tuple
 from datetime import datetime, timedelta
 import re
+import threading
+from time import sleep
+import tweepy
+
+ck, cs, tk, ts = open('key.txt', encoding='utf-8').read().split()
+auth = tweepy.OAuthHandler(ck, cs)
+auth.set_access_token(tk, ts)
+api = tweepy.API(auth, wait_on_rate_limit=True)
 
 queue = []
 delta_regex = re.compile(
@@ -68,26 +76,32 @@ def parse_message(text: str) -> str:
 
 
 def check_and_say():
-    # global queue
     while True:
         if len(queue) > 0:
-            print('와우')
-            if queue[0][0] < datetime.now():
-                print(queue.pop(0)[1])
-        print('자')
-        sleep(1)
+            if queue[0][0][0] < datetime.now():
+                api.update_status('@'+queue[0][1]+' '+queue[0][0][1])
+                print('Popped' + queue.pop(0)[0][1])
+        sleep(0.5)
+
+
+class Listener(tweepy.StreamListener):
+    def on_status(self, status):
+        global queue
+        try:
+            if status.text.startswith('@dailycommit_bot'):
+                print(status.user.screen_name + ' : ' + status.text)
+                queue.append((parse(status.text), status.user.screen_name))
+                queue = sorted(queue)
+        except Exception as ex:
+            print(ex)
 
 
 def main():
-    global queue
-    th = threading.Thread(target=check_and_say())
-    th.daemon = True
+    th = threading.Thread(target=check_and_say)
     th.start()
-    while True:
-        print('입력받자')
-        queue.append(parse(input()))
-        queue = sorted(queue)
-        print('길이: ' + str(len(queue)))
+    listener = Listener()
+    stream = tweepy.Stream(auth=api.auth, listener=listener)
+    stream.filter(track=['dailycommit_bot'])
 
 if __name__ == '__main__':
     main()
