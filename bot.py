@@ -55,8 +55,8 @@ def parse_time(text: str, pattern: int) -> datetime:
         for i in range(len(keys)):
             if parts[keys[i]] is not None:
                 res[keys[i]] = int(parts[keys[i]])
-                for j in range(i, len(keys)):
-                    res[keys[j]] = 0
+                for j in range(i+1, len(keys)):
+                    res[keys[j]] = 1
         return datetime.today().replace(**res)
 
 
@@ -70,7 +70,7 @@ def main():
     queue.append(parse(input()))
     queue = sorted(queue)
     '''
-    parse_time('2일 22시간 100초', 0)
+    print(parse_time('2월', 1))
 
 if __name__ == '__main__':
     main()
