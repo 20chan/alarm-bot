@@ -41,7 +41,7 @@ def parse_time(text: str, pattern: int) -> datetime:
         parts = parts.groupdict()
         res = {}
         for p in parts.keys():
-            if parts[p] is not None:
+            if parts[p]:
                 res[p] = int(parts[p])
         return datetime.now() + timedelta(**res)
 
@@ -50,27 +50,43 @@ def parse_time(text: str, pattern: int) -> datetime:
         if parts is None:
             raise SyntaxError("시각 파싱 에러")
         parts = parts.groupdict()
-        res = {}
-        keys = list(parts.keys())
-        for i in range(len(keys)):
-            if parts[keys[i]] is not None:
-                res[keys[i]] = int(parts[keys[i]])
-                for j in range(i+1, len(keys)):
-                    res[keys[j]] = 1
+        res = {key: None for key in parts}
+        keys = ['year', 'month', 'day', 'hour', 'minute', 'second']
+        index = len(keys)
+        for key in keys:
+            if parts[key]:
+                res[key] = parts[key]
+                index = keys.index(key)
+            elif keys.index(key) > index:
+                res[key] = 1
         return datetime.today().replace(**res)
 
 
-def parse_message(text: str, pattern: int) -> str:
-    pass
+def parse_message(text: str) -> str:
+    return str.strip(msg_regex.match(text).groupdict()['msg'])
+
+
+def check_and_say():
+    # global queue
+    while True:
+        if len(queue) > 0:
+            print('와우')
+            if queue[0][0] < datetime.now():
+                print(queue.pop(0)[1])
+        print('자')
+        sleep(1)
 
 
 def main():
-    '''
     global queue
-    queue.append(parse(input()))
-    queue = sorted(queue)
-    '''
-    print(parse_time('2월', 1))
+    th = threading.Thread(target=check_and_say())
+    th.daemon = True
+    th.start()
+    while True:
+        print('입력받자')
+        queue.append(parse(input()))
+        queue = sorted(queue)
+        print('길이: ' + str(len(queue)))
 
 if __name__ == '__main__':
     main()
