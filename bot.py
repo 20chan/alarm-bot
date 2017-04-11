@@ -8,13 +8,14 @@ delta_regex = re.compile(
 date_regex = re.compile(
     '((?P<year>\d+?)년)?[ ]*((?P<month>\d+?)월)?[ ]*((?P<day>\d+?)일)?[ ]*'
     '((?P<hour>\d+?)(시간?))?[ ]*((?P<minute>\d+?)분)?[ ]*((?P<second>\d+?)초)?')
+msg_regex = re.compile('.*에(?P<msg>.*)')
 
 
 def parse(text: str) -> Tuple[datetime, str]:
     pat = match(text)
     if 0 <= pat:
         time = parse_time(text, pat)
-        msg = parse_message(text, pat)
+        msg = parse_message(text)
         return time, msg
 
     raise SyntaxError("파싱 에러")
@@ -50,12 +51,12 @@ def parse_time(text: str, pattern: int) -> datetime:
         if parts is None:
             raise SyntaxError("시각 파싱 에러")
         parts = parts.groupdict()
-        res = {key: None for key in parts}
-        keys = ['year', 'month', 'day', 'hour', 'minute', 'second']
+        res = {key: None for key in parts if parts[key]}
+        keys = list(parts.keys())
         index = len(keys)
         for key in keys:
             if parts[key]:
-                res[key] = parts[key]
+                res[key] = int(parts[key])
                 index = keys.index(key)
             elif keys.index(key) > index:
                 res[key] = 1
