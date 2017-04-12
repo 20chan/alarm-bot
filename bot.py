@@ -79,8 +79,11 @@ def check_and_say():
     while True:
         if len(queue) > 0:
             if queue[0][0][0] < datetime.now():
-                api.update_status('@'+queue[0][1]+' '+queue[0][0][1])
-                print('보냄 : ' + queue.pop(0)[0][1])
+                try:
+                    api.update_status('@'+queue[0][1]+' '+queue[0][0][1])
+                    print('보냄 : ' + queue.pop(0)[0][1])
+                except Exception as ex:
+                    print(ex)
         sleep(0.5)
 
 
