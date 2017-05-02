@@ -4,12 +4,18 @@ import re
 import threading
 from time import sleep
 import tweepy
+from os import environ
+from os.path import exists
 
-ck, cs, tk, ts = open('key.txt', encoding='utf-8').read().split()
+if exists('key.txt'):
+    ck, cs, tk, ts = open('key.txt', encoding='utf-8').read().split()
+else:
+    ck, cs, tk, ts = [environ[name] for name in ['CONS_KEY', 'CONS_SEC', 'T_KEY', 'T_SEC']]
 auth = tweepy.OAuthHandler(ck, cs)
 auth.set_access_token(tk, ts)
 api = tweepy.API(auth, wait_on_rate_limit=True)
 
+daily_queue = []
 queue = []
 delta_regex = re.compile(
     '[^\d]*((?P<days>\d+?)일)?[ ]*((?P<hours>\d+?)(시간?))?[ ]*((?P<minutes>\d+?)분)?[ ]*((?P<seconds>\d+?)초)?')
